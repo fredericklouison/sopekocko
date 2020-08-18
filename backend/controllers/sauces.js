@@ -86,7 +86,6 @@ exports.getAllSauces = (req, res, next) => {
     }else{
       Sauces.findOne({ _id: req.params.id})
         .then((sauces) => {
-          console.log(sauces.usersLiked)
           if(sauces.usersLiked.indexOf(sauces.userId)!==-1){
             Sauces.updateOne({ _id: req.params.id },{$pull:{usersLiked:req.body.userId}})
             .then(() => {
@@ -104,7 +103,6 @@ exports.getAllSauces = (req, res, next) => {
           })
           .catch(error => res.status(400).json({ error }));
           }
-    
       })
       .catch(error => res.status(400).json({ error }));
     
