@@ -1,8 +1,11 @@
 const Sauces= require('../models/sauces');
+const sanitize=require('mongo-sanitize');
 const fs = require('fs');
 
 exports.CreateSauces=(req, res, next) => {
-    const saucesObject = JSON.parse(req.body.sauce);
+  let sauce= sanitize(req.body.sauce);
+    const saucesObject = JSON.parse(sauce);
+
         const sauces = new Sauces({
             ...saucesObject,
             likes:0,
@@ -28,8 +31,9 @@ exports.getAllSauces = (req, res, next) => {
     );
   };
   exports.getOneSauces = (req, res, next) => {
+    let id=sanitize(req.params.id)
     Sauces.findOne({
-      _id: req.params.id
+      _id: id
     }).then(
       (Sauces) => {
         res.status(200).json(Sauces);
@@ -43,22 +47,25 @@ exports.getAllSauces = (req, res, next) => {
     );
   };
   exports.modifySauces = (req, res, next) => {
+    let sauce= sanitize(req.body.sauce);
+    let id=sanitize(req.params.id)
     const saucesObject = req.file ?
       {
-        ...JSON.parse(req.body.sauce),
+        ...JSON.parse(sauce),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
       } : { ...req.body };
-    Sauces.updateOne({ _id: req.params.id }, { ...saucesObject, _id: req.params.id ,usersLiked:[],usersDisliked:[],likes:0,dislikes:0})
+    Sauces.updateOne({ _id: id }, { ...saucesObject, _id: id ,usersLiked:[],usersDisliked:[],likes:0,dislikes:0})
       .then(() => res.status(200).json({ message: 'Objet modifié !'}))
       .catch(error => res.status(400).json({ error }));
   };
 
   exports.deleteSauces = (req, res, next) => {
-    Sauces.findOne({ _id: req.params.id })
+    let id=sanitize(req.params.id)
+    Sauces.findOne({ _id: id })
       .then(sauces => {
         const filename = sauces.imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () => {
-          Sauces.deleteOne({ _id: req.params.id })
+          Sauces.deleteOne({ _id:id })
             .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
             .catch(error => res.status(400).json({ error }));
         });
