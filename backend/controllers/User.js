@@ -1,5 +1,6 @@
 const bcrypt=require('bcrypt');
 const jwt = require('jsonwebtoken');
+const dotenv =require ( 'dotenv' ) . config ( )
 const User = require('../models/User');
 const sanitize=require('mongo-sanitize')
 exports.signup = (req, res, next) => {
